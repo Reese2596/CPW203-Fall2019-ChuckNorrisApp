@@ -15,8 +15,25 @@ function fetchJoke() {
     loaderImg.classList.add("loader");
     var request = new XMLHttpRequest();
     request.onreadystatechange = handleJokeResponse;
-    request.open("GET", "https://api.icndb.com/jokes/random");
+    var url = "https://api.icndb.com/jokes/random";
+    if (isCategorySelected) {
+        url += "?limitTo=[" + getSelectedCategory + "]";
+    }
+    request.open("GET", url);
     request.send();
+}
+function isCategorySelected() {
+    var list = document.getElementById("cat-list");
+    if (list.selectedIndex == 0) {
+        return false;
+    }
+    return true;
+}
+function getSelectedCategory() {
+    var list = document.getElementById("cat-list");
+    var index = list.selectedIndex;
+    var cat = list.options[index].text;
+    return cat;
 }
 function handleJokeResponse() {
     var request = this;
@@ -64,7 +81,16 @@ function populateCategories() {
         if (this.readyState == 4 && request.status == 200) {
             var categories = JSON.parse(this.responseText).value;
             console.log(categories);
+            populateCatDropDown(categories);
         }
     };
     request.send();
+}
+function populateCatDropDown(categories) {
+    var list = document.getElementById("cat-list");
+    for (var i = 0; i < categories.length; i++) {
+        var option = document.createElement("option");
+        option.text = categories[i];
+        list.appendChild(option);
+    }
 }

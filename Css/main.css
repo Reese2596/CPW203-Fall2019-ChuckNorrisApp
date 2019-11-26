@@ -85,3 +85,11 @@ div#category, p{
     display: inline !important;
     border-radius: 10%;
 }
+
+select#cat-list, select:active, select:hover{
+    outline: none;
+    color: whitesmoke;
+    background: #000;
+    border: #000;
+}
+

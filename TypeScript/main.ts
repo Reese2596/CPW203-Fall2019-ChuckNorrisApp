@@ -36,13 +36,44 @@ function fetchJoke(){
     //function to decide what happen when recieve answer
     //based on answer(system down: cant do anything, answer:display)
     request.onreadystatechange = handleJokeResponse;
-
+    let url = "https://api.icndb.com/jokes/random";
+    if(isCategorySelected){
+        url += "?limitTo=[" + getSelectedCategory + "]";
+    }
     //Set url to send request to
-    request.open("GET", "https://api.icndb.com/jokes/random");
+    request.open("GET", url);
     //initiate request
     request.send();
 }
 
+/**
+ * Check that a category in the category list is selected if not 
+ * return false
+ */
+function isCategorySelected():boolean{
+    let list = <HTMLSelectElement>
+                        document.getElementById("cat-list");
+    if(list.selectedIndex == 0){
+        return false;
+    }
+    return true;
+}
+
+/**
+ * return the category(single) that is selected 
+ */
+function getSelectedCategory():string{
+    let list = <HTMLSelectElement>
+                document.getElementById("cat-list");
+    let index = list.selectedIndex;
+    let cat = list.options[index].text;
+
+    return cat;
+}
+
+/**
+ * Grab joke from database check to see that everything is going right
+ */
 function handleJokeResponse(){
     let request = <XMLHttpRequest> this;
     //ready state 4(request completed) && 
@@ -58,6 +89,11 @@ function handleJokeResponse(){
         alert("Please try again later. Something is wrong.")
     }
 }
+
+/**
+ * Grab all of the variables(joke, ID, category) from the icndb website
+ * and displays them to the user
+ */
 
 function displayJoke(j:ChuckNorrisJoke):void{
     let jokeTxtP = document.getElementById("joke-text");
@@ -106,12 +142,25 @@ function populateCategories(){
     request.open("GET", "https://api.icndb.com/categories" );
 
     request.onreadystatechange = function(){
-        //request or this same thang
+        //(request/this) same thang
         if(this.readyState == 4 && request.status == 200){
             let categories:string[] = JSON.parse(this.responseText).value;
             console.log(categories);
+            populateCatDropDown(categories);
         }
     }
-
     request.send();
+}
+
+/**
+ * Grabbing the categories from icndb database array list of categories
+ * add adding it to the drop down menu 
+*/
+function populateCatDropDown(categories:string[]):void{
+    let list = document.getElementById("cat-list");
+    for(let i = 0; i < categories.length; i++){
+        let option = document.createElement("option");
+        option.text = categories[i];
+        list.appendChild(option); ///add option to the select
+    }
 }
